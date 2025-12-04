@@ -1,22 +1,9 @@
 <script lang='ts'>
-  import DashBoard  from "./lib/DashBoard.svelte";
   import FileComparator from "./lib/FileComparator.svelte";
-  import Project  from "./lib/Project.svelte";
-  import BarChart from "./lib/BarChart.svelte";
-  import PerformComposit from "./lib/PerformComposit.svelte";
-  import LoadDataVerifyResult from "./lib/LoadDataVerifyResult.svelte";
   import Login from "./lib/Login.svelte";
-  import HelpManagement from "./lib/HelpManagement.svelte";
-  import UserUploadManagement from "./lib/UserUploadManagement.svelte";
-  import TransformBoard from "./lib/TransformBoard.svelte"
-  import TestComposit from "./lib/TestComposit.svelte";
-  import LoadDataUploadManagement from "./lib/LoadDataUploadManagement.svelte";//성능 Data 관리
-  import ScenarioUploadManagement from "./lib/ScenarioUploadManagement.svelte";
-  import PerformUploadManagement from "./lib/PerformUploadManagement.svelte";
   import TableManagement from "./lib/TableManagement.svelte";
   import { isLogged, userid, t} from "./aqtstore";
   import { onMount } from "svelte";
-  import Parent from "./lib/Parent.svelte";
   import SshTerminal from "./lib/SshTerminal.svelte";
   let cnm = SshTerminal ;
   let pageNm = "모니터링 종합";
@@ -31,7 +18,9 @@
               //  {pageNm:"이행",cnm:TransformBoard},
               //  {pageNm:"관리자",cnm:UserUploadManagement},
               //  {pageNm:"도움말",cnm:HelpManagement},
-               {pageNm:"SSH 터미널",cnm:SshTerminal}
+               {pageNm:"SSH 터미널",cnm:SshTerminal},
+               {pageNm:"파일 비교",cnm:FileComparator},
+               {pageNm:"테이블 관리",cnm:TableManagement}
               //  ,{pageNm:"임시",cnm:Parent}
   ]
   
@@ -70,7 +59,7 @@
           <div class="flex items-center">
             <div class="shrink-0 text-white font-bold text-2xl italic font-serif">
               <!-- <img src="/src/img/top2.png" class="object-contain"> -->
-               T&T Board
+               ASW
             </div>
             <div class="hidden md:block">
               <ul class="ml-10 flex items-baseline space-x-4">
@@ -89,21 +78,7 @@
                         </div>
                       </div>
                       {:else}
-                        {#if item.pageNm === "SSH 터미널"}
-                          <div class="group relative dropdown px-4 rounded-md px-3 py-2 text-sm font-medium text-gray-300 ">
-                            <a href="#" class="rounded-md px-3 py-2 text-sm font-medium {idx === menuIdx ? 'text-white bg-gray-900' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}">SSH 터미널</a>
-                            <div class="group-hover:block dropdown-menu absolute hidden h-auto">
-                              <ul class="top-0 w-48 bg-gray-900 shadow px-6 py-1">
-                                <li class="py-1"><a href="#" class="menu-item" on:click|preventDefault={ _=> {cnm=SshTerminal; pageNm = "SSH 터미널"; menuIdx = idx}}>SSH 터미널</a></li>
-                                <li class="py-1"><a href="#" class="menu-item" on:click|preventDefault={ _=> {cnm=FileComparator; pageNm = "파일 비교"; menuIdx = idx}}>파일 비교</a></li> 
-                                <li class="py-1"><a href="#" class="menu-item" on:click|preventDefault={ _=> {cnm=TableManagement; pageNm = "테이블 관리"; menuIdx = idx}}>테이블 관리</a></li>
-                              
-                              </ul>
-                            </div>
-                          </div>
-                        {:else}
                           <a href="#" class="rounded-md px-3 py-2 text-sm font-medium {idx === menuIdx ? 'text-white bg-gray-900' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}" on:click|preventDefault={ _=> {cnm=item.cnm;pageNm = item.pageNm; menuIdx = idx}}>{item.pageNm}</a>
-                        {/if}
                       {/if}
                   </li>
                 {/each}

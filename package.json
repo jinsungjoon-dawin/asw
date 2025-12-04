@@ -32,6 +32,8 @@
     "express": "^4.21.2",
     "http": "^0.0.1-security",
     "mariadb": "^3.4.0",
+    "pptxgenjs": "^4.0.1",
+    "puppeteer": "^24.31.0",
     "ssh2": "^1.17.0",
     "svelte-i18n": "^4.0.1",
     "xlsx": "^0.18.5"

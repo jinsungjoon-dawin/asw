@@ -35,7 +35,6 @@
       passwordInput.focus();
       return;
     }
-    
 		if (password === "aqtuser") {
 			showModal = true;
 			return;
@@ -171,17 +170,17 @@
     }
   }
 
-  // onMount(async() => {
+  onMount(async() => {
     
-  //   rdata = await getData();
-  //   intlMs.set(rdata[0].intl * 1000); // 타이머 주기 설정값 store 저장 $intlMs 사용
+    rdata = await getData();
+    intlMs.set(rdata[0].intl * 1000); // 타이머 주기 설정값 store 저장 $intlMs 사용
       
-  //   if(localStorage.getItem('usridChk') === "true"){
-  //     usridChk = true;
-  //     usrid = localStorage.getItem('usrid');
-  //   }
+    if(localStorage.getItem('usridChk') === "true"){
+      usridChk = true;
+      usrid = localStorage.getItem('usrid');
+    }
     
-  // })
+  })
 
 
   
@@ -212,10 +211,10 @@
         <img src="src/img/logo9.png" alt="Logo" class="p-5 object-contain" />
       </div> -->
       <div class="flex justify-center items-end font-bold text-4xl  font-serif text-blue-500 h-24">
-         ASW
+         T&T Boards
       </div>
       <div class="flex justify-center font-bold text-[xx-small] italic font-serif ml-40 h-10">
-         <!-- Test & Transition -->
+         Test & Transition
       </div>
       <div class="w-full text-xl font-semibold text-center text-gray-700 mb-6">{rdata[0]?.pjtname}</div>
       
@@ -257,7 +256,8 @@
         <div><label for="usridChk">계정저장</label> <input type="checkbox" id="usridChk" bind:checked={usridChk}></div>
         <a href="#" class="text-sm text-blue-500 hover:underline" on:click={toggleModal}>비밀번호 변경</a>
       </div>
-   
+  
+     
       <div class="flex justify-end h-24">
         &nbsp;
          <img src="/img/DAWINICT_logo.png" alt="Logo" class="w-20 h-20 object-contain" />

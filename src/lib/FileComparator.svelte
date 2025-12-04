@@ -188,32 +188,51 @@
           const oldContent = oldRes.content || `(내용 없음) \n오류: ${oldRes.error || ''}`;
           const newContent = newRes.content || `(내용 없음) \n오류: ${newRes.error || ''}`;
           
-          // diffLines를 사용해 두 파일 내용 비교
           const diffs = diffLines(oldContent, newContent);
+          
+          let oldLineNum = 1;
+          let newLineNum = 1;
+          let oldHtml = '';
+          let newHtml = '';
 
-          // diff 결과를 하이라이팅된 HTML 문자열로 변환 (이전 정보)
-          oldDiffHtml = diffs.map(part => {
-            if (part.added) return ''; // 추가된 부분은 이전 정보에 표시 안 함
-            const className = part.removed ? 'bg-red-200' : ''; // 삭제된 부분은 배경색 처리
-            return `<span class="${className}">${escapeHtml(part.value)}</span>`;
-          }).join('');
+          diffs.forEach(part => {
+            const lines = part.value.split('\n').slice(0, -1); // 마지막 빈 줄 제외
+            if (part.added) {
+              lines.forEach(line => {
+                newHtml += `<div class="line-wrapper"><span class="line-num">${newLineNum++}</span><span class="line-content bg-green-200">${escapeHtml(line)}</span></div>`;
+                oldHtml += `<div class="line-wrapper"><span class="line-num"></span><span class="line-content empty-line"></span></div>`;
+              });
+            } else if (part.removed) {
+              lines.forEach(line => {
+                oldHtml += `<div class="line-wrapper"><span class="line-num">${oldLineNum++}</span><span class="line-content bg-red-200">${escapeHtml(line)}</span></div>`;
+                newHtml += `<div class="line-wrapper"><span class="line-num"></span><span class="line-content empty-line"></span></div>`;
+              });
+            } else {
+              lines.forEach(line => {
+                oldHtml += `<div class="line-wrapper"><span class="line-num">${oldLineNum++}</span><span class="line-content">${escapeHtml(line)}</span></div>`;
+                newHtml += `<div class="line-wrapper"><span class="line-num">${newLineNum++}</span><span class="line-content">${escapeHtml(line)}</span></div>`;
+              });
+            }
+          });
 
-          // diff 결과를 하이라이팅된 HTML 문자열로 변환 (현재 정보)
-          newDiffHtml = diffs.map(part => {
-            if (part.removed) return '';
-            const className = part.added ? 'bg-green-200' : '';
-            return `<span class="${className}">${escapeHtml(part.value)}</span>`;
-          }).join('');
+          oldDiffHtml = oldHtml;
+          newDiffHtml = newHtml;
 
         } else if (type === 'added') {
           // '신규' 파일 내용 가져오기
           const res = await fetchFileContent(item.file_path);
-          newFileContent = res.content || `(내용 없음) \n오류: ${res.error || ''}`;
+          const content = res.content || `(내용 없음) \n오류: ${res.error || ''}`;
+          newFileContent = content.split('\n').map((line, i) => 
+            `<div class="line-wrapper"><span class="line-num">${i + 1}</span><span class="line-content">${escapeHtml(line)}</span></div>`
+          ).join('');
           oldFileContent = ''; // 추가된 파일이므로 이전 내용은 없음
         } else if (type === 'deleted') {
           // '삭제' 파일 내용 가져오기
           const res = await fetchFileContent(item.file_path);
-          oldFileContent = res.content || `(내용 없음) \n오류: ${res.error || ''}`;
+          const content = res.content || `(내용 없음) \n오류: ${res.error || ''}`;
+          oldFileContent = content.split('\n').map((line, i) =>
+            `<div class="line-wrapper"><span class="line-num">${i + 1}</span><span class="line-content">${escapeHtml(line)}</span></div>`
+          ).join('');
           newFileContent = ''; // 삭제된 파일이므로 새 내용은 없음
         }
       } catch (error) {
@@ -272,6 +291,32 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
   }
+
+  // 스타일 추가
+  const style = document.createElement('style');
+  style.textContent = `
+    .line-wrapper {
+      display: flex;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .line-num {
+      width: 40px;
+      flex-shrink: 0; /* 줄어들지 않도록 설정 */
+      text-align: right;
+      padding-right: 8px;
+      color: #9ca3af; /* gray-400 */
+      user-select: none;
+    }
+    .line-content {
+      flex-grow: 1; /* 남은 공간을 모두 차지 */
+      white-space: pre-wrap; /* 공백 유지 및 자동 줄바꿈 */
+      word-break: break-all; /* 긴 단어 강제 줄바꿈 */
+    }
+    .line-content.empty-line { 
+      background-color: #f3f4f6; /* gray-100 */ 
+    }
+  `;
+  document.head.appendChild(style);
 
 </script>
 
@@ -460,7 +505,7 @@
                     {#if isContentLoading}
                       <pre class="bg-gray-100 p-2 rounded text-xs flex-grow overflow-auto">로딩 중...</pre>
                     {:else}
-                      <pre class="bg-gray-100 p-2 rounded text-xs flex-grow overflow-auto">{@html modalType === 'modified' ? oldDiffHtml : oldFileContent}</pre>
+                      <pre class="bg-gray-100 p-2 rounded text-xs flex-grow overflow-auto font-mono">{@html modalType === 'modified' ? oldDiffHtml : oldFileContent}</pre>
                     {/if}
                   </div>
                 {/if}
@@ -480,7 +525,7 @@
                     {#if isContentLoading}
                       <pre class="bg-gray-100 p-2 rounded text-xs flex-grow overflow-auto">로딩 중...</pre>
                     {:else}
-                      <pre class="bg-gray-100 p-2 rounded text-xs flex-grow overflow-auto">{@html modalType === 'modified' ? newDiffHtml : newFileContent}</pre>
+                      <pre class="bg-gray-100 p-2 rounded text-xs flex-grow overflow-auto font-mono">{@html modalType === 'modified' ? newDiffHtml : newFileContent}</pre>
                     {/if}
                   </div>
                 {/if}
